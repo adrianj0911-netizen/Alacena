@@ -4,6 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Nuestra Despensa - App de Casa</title>
+    
+    <!-- Configuración para PWA e Iconos (Logo) -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Despensa">
+    <!-- Icono para iPhone/iPad -->
+    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/lucide-react/lucide/main/icons/home.svg">
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23FF8C42%22/><path d=%22M30 45 L50 25 L70 45 V75 H30 Z%22 fill=%22white%22/><circle cx=%2250%22 cy=%2255%22 r=%2210%22 fill=%22%23FF8C42%22/></svg>">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Firebase SDKs (Compat version) -->
     <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app-compat.js"></script>
@@ -66,6 +76,10 @@
             background-color: var(--color-naranja);
             color: white;
         }
+        .pin-active {
+            color: var(--color-naranja);
+            background-color: #FFF3E0 !important;
+        }
     </style>
 </head>
 <body class="min-h-screen pb-24">
@@ -74,8 +88,16 @@
     <div id="login-screen" class="fixed inset-0 flex items-center justify-center p-6 bg-crema z-50">
         <div class="w-full max-w-md text-center">
             <div class="mb-8">
-                <span class="text-6xl">🏠</span>
-                <h1 class="text-3xl font-bold mt-4 text-marron">Nuestra Despensa</h1>
+                <!-- Logo Visual en Pantalla de Login -->
+                <div class="inline-block mb-4">
+                    <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="100" height="100" rx="25" fill="#FF8C42"/>
+                        <path d="M30 48L50 28L70 48V75H30V48Z" fill="white"/>
+                        <circle cx="50" cy="56" r="10" fill="#FF8C42"/>
+                        <path d="M48 48C48 45 52 45 52 48" stroke="#FF8C42" stroke-width="2"/>
+                    </svg>
+                </div>
+                <h1 class="text-3xl font-bold text-marron">Nuestra Despensa</h1>
                 <p class="text-orange-500 font-semibold italic">Gestión inteligente de hogar</p>
             </div>
             <div class="space-y-4">
@@ -88,9 +110,16 @@
 
     <!-- Header Principal -->
     <header id="main-header" class="hidden sticky top-0 bg-white p-4 flex justify-between items-center shadow-sm z-40">
-        <div>
-            <h2 id="display-house" class="text-xl font-bold text-orange-600 leading-tight tracking-tight">CASA</h2>
-            <p id="display-user" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest"></p>
+        <div class="flex items-center gap-3">
+             <div class="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center overflow-hidden">
+                <svg viewBox="0 0 100 100" class="w-6 h-6">
+                    <path d="M30 45 L50 25 L70 45 V75 H30 Z" fill="white"/>
+                </svg>
+             </div>
+             <div>
+                <h2 id="display-house" class="text-xl font-bold text-orange-600 leading-tight tracking-tight">CASA</h2>
+                <p id="display-user" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest"></p>
+             </div>
         </div>
         <div class="flex gap-2">
             <button onclick="ui.toggleModal('modal-config-cats')" class="p-2 bg-gray-50 rounded-full text-lg" title="Categorías">⚙️</button>
@@ -200,12 +229,9 @@
             <p id="confirm-buy-text" class="text-gray-600 text-sm"></p>
             
             <div class="space-y-3">
-                <!-- Selector de Categoría para el producto comprado -->
                 <div class="space-y-1">
                     <p class="text-[10px] font-bold text-orange-600 uppercase">Categoría:</p>
-                    <select id="confirm-buy-cat-select" class="input-custom item-cat-select">
-                        <!-- Se llena dinámicamente con todas las categorías -->
-                    </select>
+                    <select id="confirm-buy-cat-select" class="input-custom item-cat-select"></select>
                 </div>
 
                 <div class="space-y-1">
@@ -231,10 +257,11 @@
         </div>
     </div>
 
-    <!-- MODAL: NUEVA RECETA -->
+    <!-- MODAL: NUEVA/EDITAR RECETA -->
     <div id="modal-receta" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white w-full max-w-md my-8 rounded-2xl p-6 space-y-4 shadow-2xl">
-            <h3 class="text-xl font-bold">Crear Receta</h3>
+            <h3 id="modal-receta-titulo" class="text-xl font-bold">Crear Receta</h3>
+            <input type="hidden" id="receta-id-edit" value="">
             
             <div class="space-y-3">
                 <input type="text" id="receta-nombre" placeholder="Nombre del plato" class="input-custom">
@@ -271,11 +298,14 @@
     <div id="modal-detalles-receta" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white w-full max-w-md my-auto rounded-3xl p-6 space-y-4 shadow-2xl max-h-[90vh] flex flex-col">
             <div class="flex justify-between items-start border-b pb-4">
-                <div>
+                <div class="flex-1">
                     <h3 id="detalle-titulo" class="text-2xl font-bold text-marron capitalize"></h3>
                     <span id="detalle-tag" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-orange-100 text-orange-600 uppercase"></span>
                 </div>
-                <button onclick="ui.toggleModal('modal-detalles-receta')" class="p-2 bg-gray-100 rounded-full">✕</button>
+                <div class="flex gap-2">
+                    <button id="btn-edit-receta-detalle" class="p-2 bg-blue-50 text-blue-500 rounded-full text-xs">✏️</button>
+                    <button onclick="ui.toggleModal('modal-detalles-receta')" class="p-2 bg-gray-100 rounded-full">✕</button>
+                </div>
             </div>
             <div class="overflow-y-auto flex-1 pr-2 space-y-6 mt-2">
                 <div>
@@ -368,6 +398,10 @@
                 window.scrollTo(0, 0);
             },
             toggleModal(id) {
+                if(id === 'modal-receta' && document.getElementById(id).classList.contains('hidden')) {
+                    document.getElementById('modal-receta-titulo').innerText = "Crear Receta";
+                    document.getElementById('receta-id-edit').value = "";
+                }
                 document.getElementById(id).classList.toggle('hidden');
             },
             addIngredienteRow(valName = '', valQty = '', valUnit = 'unidades') {
@@ -410,12 +444,36 @@
                     `;
                 }).join('');
 
+                document.getElementById('btn-edit-receta-detalle').onclick = () => {
+                    this.toggleModal('modal-detalles-receta');
+                    this.prepareEditReceta(rid);
+                };
+
                 const acciones = document.getElementById('detalle-acciones');
                 acciones.innerHTML = apto 
                     ? `<button onclick="app.ejecutarCocina('${rid}'); ui.toggleModal('modal-detalles-receta');" class="w-full bg-green-500 text-white py-4 rounded-2xl font-bold shadow-lg">COCINAR AHORA 🍳</button>`
                     : `<button onclick="app.pedirFaltantes('${rid}'); ui.toggleModal('modal-detalles-receta');" class="w-full bg-orange-500 text-white py-4 rounded-2xl font-bold shadow-lg">PEDIR FALTANTES 🛒</button>`;
 
                 this.toggleModal('modal-detalles-receta');
+            },
+            prepareEditReceta(rid) {
+                const receta = state.recetas.find(r => r.id === rid);
+                if(!receta) return;
+
+                document.getElementById('modal-receta-titulo').innerText = "Editar Receta";
+                document.getElementById('receta-id-edit').value = rid;
+                document.getElementById('receta-nombre').value = receta.nombre;
+                document.getElementById('receta-categoria-tipo').value = receta.tipo;
+                document.getElementById('receta-preparacion').value = receta.preparacion;
+
+                const container = document.getElementById('receta-ingredientes-container');
+                container.innerHTML = '<p class="font-bold text-xs text-orange-600 uppercase">Ingredientes Requeridos:</p>';
+                receta.ingredientes.forEach(ing => {
+                    const disp = conversion.display(ing.cantidad, ing.unidad);
+                    this.addIngredienteRow(ing.nombre, disp.val, disp.unit);
+                });
+
+                this.toggleModal('modal-receta');
             },
             updateLoginUI() {
                 if(state.user && state.house) {
@@ -540,8 +598,10 @@
                     btn.classList.add('bg-white', 'text-gray-400');
                 });
                 const activeBtn = document.getElementById(`f-rec-${tipo}`);
-                activeBtn.classList.add('active', 'bg-orange-500', 'text-white');
-                activeBtn.classList.remove('bg-white', 'text-gray-400');
+                if(activeBtn) {
+                    activeBtn.classList.add('active', 'bg-orange-500', 'text-white');
+                    activeBtn.classList.remove('bg-white', 'text-gray-400');
+                }
                 this.renderRecetas();
             },
 
@@ -639,7 +699,6 @@
                 document.getElementById('confirm-buy-qty').value = item.cantidad;
                 document.getElementById('confirm-buy-unit-select').value = item.unidad; 
 
-                // Intentar detectar si el producto ya existe para pre-seleccionar su categoría
                 const docId = item.nombre.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
                 const existingItem = state.inventario.find(i => i.id === docId);
                 if(existingItem && existingItem.categoria) {
@@ -662,7 +721,7 @@
                     if(invDoc.exists) {
                         await itemRef.update({ 
                             cantidad: firebase.firestore.FieldValue.increment(norm.val),
-                            categoria: selectedCat // Actualizar categoría por si se cambió
+                            categoria: selectedCat 
                         });
                     } else {
                         await itemRef.set({
@@ -701,6 +760,7 @@
             },
 
             async saveReceta() {
+                const editId = document.getElementById('receta-id-edit').value;
                 const nombre = document.getElementById('receta-nombre').value.trim();
                 const tipo = document.getElementById('receta-categoria-tipo').value;
                 const preparacion = document.getElementById('receta-preparacion').value.trim();
@@ -717,18 +777,27 @@
 
                 if(!nombre || ingredientes.length === 0) return alert("Faltan datos");
 
-                await db.collection('casas').doc(state.house).collection('recetas').add({ 
+                const recetaData = { 
                     nombre, 
                     tipo,
                     ingredientes, 
                     preparacion,
                     user: state.user 
-                });
+                };
+
+                if(editId) {
+                    await db.collection('casas').doc(state.house).collection('recetas').doc(editId).update(recetaData);
+                } else {
+                    // Por defecto las nuevas recetas no están fijadas
+                    recetaData.fixed = false;
+                    await db.collection('casas').doc(state.house).collection('recetas').add(recetaData);
+                }
                 
                 ui.toggleModal('modal-receta');
                 document.getElementById('receta-nombre').value = '';
                 document.getElementById('receta-preparacion').value = '';
                 document.getElementById('receta-ingredientes-container').innerHTML = '';
+                document.getElementById('receta-id-edit').value = "";
                 ui.addIngredienteRow();
             },
 
@@ -738,7 +807,7 @@
                 receta.ingredientes.forEach(ing => {
                     const norm = n => n.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
                     const inv = state.inventario.find(i => norm(i.nombre) === norm(ing.nombre));
-                    if(!inv || inv.cantidad < (ing.cantidad - 0.001)) { // Tolerancia flotante
+                    if(!inv || inv.cantidad < (ing.cantidad - 0.001)) { 
                         apto = false;
                         const faltaVal = ing.cantidad - (inv ? inv.cantidad : 0);
                         const displayFalta = conversion.display(faltaVal, ing.unidad);
@@ -746,6 +815,12 @@
                     }
                 });
                 return { apto, faltantes };
+            },
+
+            async toggleFixedReceta(id, currentStatus) {
+                await db.collection('casas').doc(state.house).collection('recetas').doc(id).update({
+                    fixed: !currentStatus
+                });
             },
 
             async ejecutarCocina(id) {
@@ -790,12 +865,30 @@
                     return;
                 }
 
-                filtered.forEach(receta => {
-                    const { apto } = this.checkStock(receta);
+                // ORDENACIÓN: 
+                // 1. Fixed primero
+                // 2. Disponibles segundo (apto)
+                // 3. El resto
+                const sortedRecetas = filtered.map(r => ({...r, status: this.checkStock(r)})).sort((a, b) => {
+                    // Prioridad 1: Fijadas
+                    if (a.fixed && !b.fixed) return -1;
+                    if (!a.fixed && b.fixed) return 1;
+                    
+                    // Prioridad 2: Disponibles para cocinar
+                    if (a.status.apto && !b.status.apto) return -1;
+                    if (!a.status.apto && b.status.apto) return 1;
+                    
+                    return 0;
+                });
+
+                sortedRecetas.forEach(receta => {
+                    const apto = receta.status.apto;
+                    const isFixed = receta.fixed || false;
                     const div = document.createElement('div');
-                    div.className = `card-item p-4 border-l-4 ${apto ? 'border-green-400' : 'border-orange-300'} cursor-pointer active:opacity-75 transition-opacity`;
+                    div.className = `card-item p-4 border-l-4 ${apto ? 'border-green-400' : 'border-orange-300'} cursor-pointer active:opacity-75 transition-opacity relative`;
                     div.onclick = (e) => {
-                        if(e.target.tagName !== 'BUTTON') ui.openRecetaDetalle(receta.id);
+                        if(e.target.closest('button')) return;
+                        ui.openRecetaDetalle(receta.id);
                     };
                     
                     const resumenIng = receta.ingredientes.slice(0, 3).map(i => i.nombre).join(', ');
@@ -805,14 +898,19 @@
 
                     div.innerHTML = `
                         <div class="flex justify-between items-start">
-                            <div>
+                            <div class="flex-1">
                                 <div class="flex items-center gap-2">
                                     <span class="text-xs">${iconMap[receta.tipo] || '🍳'}</span>
-                                    <h4 class="font-bold text-marron capitalize truncate max-w-[180px]">${receta.nombre}</h4>
+                                    <h4 class="font-bold text-marron capitalize truncate max-w-[150px]">${receta.nombre}</h4>
+                                    ${isFixed ? '<span class="text-orange-500 text-xs">📌</span>' : ''}
                                 </div>
                                 <p class="text-[10px] text-gray-400 mt-1">📝 ${resumenIng}${extra}</p>
                             </div>
-                            <button onclick="event.stopPropagation(); db.collection('casas').doc(state.house).collection('recetas').doc('${receta.id}').delete()" class="p-1 text-gray-300 hover:text-red-400">🗑️</button>
+                            <div class="flex gap-1">
+                                <button onclick="app.toggleFixedReceta('${receta.id}', ${isFixed})" class="p-2 ${isFixed ? 'pin-active' : 'bg-gray-50 text-gray-400'} rounded-full text-[10px]" title="Fijar arriba">📌</button>
+                                <button onclick="ui.prepareEditReceta('${receta.id}')" class="p-2 bg-blue-50 text-blue-400 rounded-full text-[10px]">✏️</button>
+                                <button onclick="db.collection('casas').doc(state.house).collection('recetas').doc('${receta.id}').delete()" class="p-2 bg-red-50 text-red-300 rounded-full text-[10px]">🗑️</button>
+                            </div>
                         </div>
                         <div class="mt-3 flex items-center justify-between">
                              <span class="text-[9px] font-bold px-2 py-1 rounded-full ${apto ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'} uppercase tracking-tight">
@@ -828,10 +926,10 @@
 
         window.onload = () => {
             ui.updateLoginUI();
-            ui.addIngredienteRow();
+            if(document.getElementById('receta-ingredientes-container').children.length <= 1) {
+                ui.addIngredienteRow();
+            }
         };
     </script>
 </body>
 </html>
-
-```
