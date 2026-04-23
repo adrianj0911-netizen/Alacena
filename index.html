@@ -5,18 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Nuestra Despensa - App de Casa</title>
     
-    <!-- Configuración PWA e Icono para iPhone (Logo Diseñado) -->
+    <!-- Configuración PWA e Icono para iPhone -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Despensa">
     
-    <!-- Icono específico para Apple (Logo de Casa y Manzana en Naranja) -->
-    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjIwIiBmaWxsPSIjRkY4QzQyIi8+PHBhdGggZD0iTTMwIDQ1IEw1MCAyNSBMNzAgNDUgVjc1IEgzMCBaIiBmaWxsPSJ3aGl0ZSIvPjxjaXJjbGUgY3g9IjUwIiBjeT0iNTUiIHI9IjEwIiBmaWxsPSIjRkY4QzQyIi8+PC9zdmc+">
+    <!-- Icono en formato PNG Base64 (Máxima compatibilidad con iOS Safari) -->
+    <link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACgCAYAAACLz2ctAAAACXBIWXMAAAsTAAALEwEAmpwYAAADuGlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNy4yLWMwMDAgNzkuMWI2NWE3OWIsIDIwMjIvMDYvMTMtMjI6MDE6MDEgICAgICAgICI+IDxyZGY6UkRGIHhtbG5zOnJkZj0iaHR0cDovL3d3dy53My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zIyI+IDxyZGY6RGVzY3JpcHRpb24gcmRmOmFib3V0PSIiIHhtbG5zOnhtcD0iaHR0cDovL3d3dy53My5vcmcveG1wLzEuMC8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdFJlZj0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlUmVmIyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgMjMuNCAoV2luZG93cykiIHhtcE1N朝luc3RhbmNlSUQ9InhtcC5paWQ6RUEzRkI0Qjc0Mjg0MTFFRUE5NThCQzg1NDYyOUIyQUQiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6RUEzRkI0Qjg0Mjg0MTFFRUE5NThCQzg1NDYyOUIyQUQiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDpFQTNGQjRCNTQyODQxMUVFQTk1OEJDPDg1NDYyOUIyQUQiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6RUEzRkI0QjY0Mjg0MTFFRUE5NThCQzg1NDYyOUIyQUQiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InciPz5Y99EFAAAByElEQVR4nO3WsQ0AIAwEwYf9N2YpLMEp8idAtuSstfYA8I87AAnDAAyDARDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAhDGAsZfAByLAnV5mAAAAABJRU5ErkJggg==">
     
-    <!-- Favicon para Navegadores -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23FF8C42%22/><path d=%22M30 45 L50 25 L70 45 V75 H30 Z%22 fill=%22white%22/><circle cx=%2250%22 cy=%2255%22 r=%2210%22 fill=%22%23FF8C42%22/></svg>">
-
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Firebase SDKs (Compat version) -->
     <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app-compat.js"></script>
